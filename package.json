@@ -1,0 +1,52 @@
+{
+  "name": "@ravshansbox/pi-notification",
+  "version": "0.0.0",
+  "description": "OSC 777 terminal notification extension for pi",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ravshansbox/pi-notification.git"
+  },
+  "homepage": "https://github.com/ravshansbox/pi-notification#readme",
+  "bugs": {
+    "url": "https://github.com/ravshansbox/pi-notification/issues"
+  },
+  "keywords": [
+    "pi-package",
+    "pi-extension",
+    "notification"
+  ],
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "node --test",
+    "check": "npm run typecheck && npm run lint && npm run format:check && npm test"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.6.5",
+    "eslint": "^10.13.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.9.10",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.0"
+  },
+  "files": [
+    "index.ts"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
