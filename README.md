@@ -8,6 +8,8 @@ OSC 777 terminal notification extension for pi.
 pi install npm:@ravshansbox/pi-notification
 ```
 
+Add `-l` to install it in project settings.
+
 ## Usage
 
 Pi loads the extension from `./index.ts` and sends an OSC 777 desktop notification (`Pi: Ready for input`) when the agent has finished and is waiting for input.
