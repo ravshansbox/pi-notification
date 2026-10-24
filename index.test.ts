@@ -5,7 +5,11 @@ import extension from './index.ts';
 
 type Handler = (event: unknown, ctx: { hasUI: boolean }) => unknown;
 
-function settle(env: Record<string, string | undefined>, hasUI = true): string {
+function settle(
+  env: Record<string, string | undefined>,
+  hasUI = true,
+  event = 'agent_settled',
+): string {
   const handlers = new Map<string, Handler>();
   const pi = {
     on: (event: string, h: Handler) => {
@@ -24,7 +28,7 @@ function settle(env: Record<string, string | undefined>, hasUI = true): string {
   if (env['TMUX'] === undefined) delete process.env['TMUX'];
   else process.env['TMUX'] = env['TMUX'];
   try {
-    handlers.get('agent_settled')?.({ type: 'agent_settled' }, { hasUI });
+    handlers.get(event)?.({ type: event }, { hasUI });
   } finally {
     process.stdout.write = write;
     if (original.TMUX === undefined) delete process.env['TMUX'];
@@ -46,4 +50,8 @@ test('wraps the notification for tmux passthrough', () => {
 
 test('does not notify without a UI', () => {
   assert.equal(settle({}, false), '');
+});
+
+test('sends an OSC 777 notification when a UI prompt starts', () => {
+  assert.equal(settle({}, true, 'ui_prompt_start'), '\x1b]777;notify;Pi;Ready\x07');
 });
