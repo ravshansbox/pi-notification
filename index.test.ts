@@ -34,13 +34,13 @@ function settle(env: Record<string, string | undefined>, hasUI = true): string {
 }
 
 test('sends an OSC 777 notification when the agent settles', () => {
-  assert.equal(settle({}), '\x1b]777;notify;Pi;Ready for input\x07');
+  assert.equal(settle({}), '\x1b]777;notify;Pi;Ready\x07');
 });
 
 test('wraps the notification for tmux passthrough', () => {
   assert.equal(
     settle({ TMUX: '/tmp/tmux-501/default,1,0' }),
-    '\x1bPtmux;\x1b\x1b]777;notify;Pi;Ready for input\x07\x1b\\',
+    '\x1bPtmux;\x1b\x1b]777;notify;Pi;Ready\x07\x1b\\',
   );
 });
 

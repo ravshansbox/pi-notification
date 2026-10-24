@@ -11,7 +11,7 @@ function wrapForTmux(sequence: string): string {
 export default function (pi: ExtensionAPI) {
   pi.on('agent_settled', (_event, ctx) => {
     if (!ctx.hasUI) return;
-    const sequence = osc777('Pi', 'Ready for input');
+    const sequence = osc777('Pi', 'Ready');
     process.stdout.write(process.env['TMUX'] ? wrapForTmux(sequence) : sequence);
   });
 }
