@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
 import extension from './index.ts';
 
-type Ctx = { hasUI: boolean; mode: string };
+type Ctx = { hasUI: boolean; mode: string; isIdle: () => boolean };
 type Handler = (event: unknown, ctx: Ctx) => unknown;
 
 function settle(
@@ -11,6 +11,7 @@ function settle(
   hasUI = true,
   event = 'agent_settled',
   mode = 'tui',
+  idle = false,
 ): string {
   const handlers = new Map<string, Handler>();
   const pi = {
@@ -30,7 +31,7 @@ function settle(
   if (env['TMUX'] === undefined) delete process.env['TMUX'];
   else process.env['TMUX'] = env['TMUX'];
   try {
-    handlers.get(event)?.({ type: event }, { hasUI, mode });
+    handlers.get(event)?.({ type: event }, { hasUI, mode, isIdle: () => idle });
   } finally {
     process.stdout.write = write;
     if (original.TMUX === undefined) delete process.env['TMUX'];
@@ -60,4 +61,8 @@ test('sends an OSC 777 notification when a UI prompt starts', () => {
 
 test('does not notify in RPC mode', () => {
   assert.equal(settle({}, true, 'agent_settled', 'rpc'), '');
+});
+
+test('does not notify when a UI prompt starts while the agent is idle', () => {
+  assert.equal(settle({}, true, 'ui_prompt_start', 'tui', true), '');
 });
