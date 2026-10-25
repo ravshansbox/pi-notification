@@ -12,6 +12,7 @@ function settle(
   event = 'agent_settled',
   mode = 'tui',
   idle = false,
+  payload: Record<string, unknown> = {},
 ): string {
   const handlers = new Map<string, Handler>();
   const pi = {
@@ -31,7 +32,7 @@ function settle(
   if (env['TMUX'] === undefined) delete process.env['TMUX'];
   else process.env['TMUX'] = env['TMUX'];
   try {
-    handlers.get(event)?.({ type: event }, { hasUI, mode, isIdle: () => idle });
+    handlers.get(event)?.({ type: event, ...payload }, { hasUI, mode, isIdle: () => idle });
   } finally {
     process.stdout.write = write;
     if (original.TMUX === undefined) delete process.env['TMUX'];
@@ -61,6 +62,10 @@ test('sends an OSC 777 notification when a UI prompt starts', () => {
 
 test('does not notify in RPC mode', () => {
   assert.equal(settle({}, true, 'agent_settled', 'rpc'), '');
+});
+
+test('does not notify when the user aborts the run', () => {
+  assert.equal(settle({}, true, 'agent_settled', 'tui', false, { aborted: true }), '');
 });
 
 test('does not notify when a UI prompt starts while the agent is idle', () => {
