@@ -9,8 +9,8 @@ function wrapForTmux(sequence: string): string {
 }
 
 export default function (pi: ExtensionAPI) {
-  const notify = (_event: unknown, ctx: { hasUI: boolean }) => {
-    if (!ctx.hasUI) return;
+  const notify = (_event: unknown, ctx: { hasUI: boolean; mode: string }) => {
+    if (!ctx.hasUI || ctx.mode !== 'tui') return;
     const sequence = osc777('Pi', 'Ready');
     process.stdout.write(process.env['TMUX'] ? wrapForTmux(sequence) : sequence);
   };
