@@ -3,12 +3,11 @@ import { test } from 'node:test';
 import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
 import extension from './index.ts';
 
-type Ctx = { hasUI: boolean; mode: string; isIdle: () => boolean };
+type Ctx = { mode: string; isIdle: () => boolean };
 type Handler = (event: unknown, ctx: Ctx) => unknown;
 
 function settle(
   env: Record<string, string | undefined>,
-  hasUI = true,
   event = 'agent_settled',
   mode = 'tui',
   idle = false,
@@ -32,7 +31,7 @@ function settle(
   if (env['TMUX'] === undefined) delete process.env['TMUX'];
   else process.env['TMUX'] = env['TMUX'];
   try {
-    handlers.get(event)?.({ type: event, ...payload }, { hasUI, mode, isIdle: () => idle });
+    handlers.get(event)?.({ type: event, ...payload }, { mode, isIdle: () => idle });
   } finally {
     process.stdout.write = write;
     if (original.TMUX === undefined) delete process.env['TMUX'];
@@ -53,21 +52,23 @@ test('wraps the notification for tmux passthrough', () => {
 });
 
 test('does not notify without a UI', () => {
-  assert.equal(settle({}, false), '');
+  for (const mode of ['print', 'json']) {
+    assert.equal(settle({}, 'agent_settled', mode), '', mode);
+  }
 });
 
 test('sends an OSC 777 notification when a UI prompt starts', () => {
-  assert.equal(settle({}, true, 'ui_prompt_start'), '\x1b]777;notify;Pi;Ready\x07');
+  assert.equal(settle({}, 'ui_prompt_start'), '\x1b]777;notify;Pi;Ready\x07');
 });
 
 test('does not notify in RPC mode', () => {
-  assert.equal(settle({}, true, 'agent_settled', 'rpc'), '');
+  assert.equal(settle({}, 'agent_settled', 'rpc'), '');
 });
 
 test('does not notify when the user aborts the run', () => {
-  assert.equal(settle({}, true, 'agent_settled', 'tui', false, { aborted: true }), '');
+  assert.equal(settle({}, 'agent_settled', 'tui', false, { aborted: true }), '');
 });
 
 test('does not notify when a UI prompt starts while the agent is idle', () => {
-  assert.equal(settle({}, true, 'ui_prompt_start', 'tui', true), '');
+  assert.equal(settle({}, 'ui_prompt_start', 'tui', true), '');
 });
